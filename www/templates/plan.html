@@ -1,0 +1,29 @@
+<ion-view view-title="プラン">
+  <ion-content>
+    <h2 class="text-center">{{plan.title}}</h2>
+    <ion-list>
+
+      <ion-item class="item-input">
+        <span class="input-label">プラン名</span>
+        <span>{{plan.title}}</span>
+      </ion-item>
+
+      <ion-item class="item-input">
+        <span class="input-label">開催日</span>
+        <span>{{plan.start}}〜{{plan.end}}</span>
+      </ion-item>
+
+      <ion-item class="item-input">
+        <span class="input-label">参加メンバー</span>
+        <ion-list>
+          <div ng-repeat="member in memberlists">
+            <span ng-class="{red:member.attendance==1}">
+              {{member.name}}さん（{{attendance[member.attendance]}}）
+            </span>
+          </div>
+        </ion-list>
+      </ion-item>
+
+    </ion-list>
+  </ion-content>
+</ion-view>

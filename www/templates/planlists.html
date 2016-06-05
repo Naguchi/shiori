@@ -1,0 +1,10 @@
+<ion-view view-title="プラン一覧">
+  <ion-content>
+    <ion-list>
+      <ion-item ng-repeat="plan in planlists" href="#/app/planlists/{{plan.id}}">
+        {{plan.title}}<br>
+        {{plan.start}}から{{plan.end}}
+     	</ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>
