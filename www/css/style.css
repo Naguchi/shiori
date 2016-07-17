@@ -6,3 +6,14 @@
   color: green; }
 .yellow {
   color: yellow; }
+
+.newLine {
+  white-space: pre-line;
+}
+
+.listColumn {
+  float: left;
+}
+.listIndexColumn {
+  width: 2em;
+}

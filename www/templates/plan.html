@@ -10,19 +10,26 @@
 
       <ion-item class="item-input">
         <span class="input-label">開催日</span>
-        <span>{{plan.start}}〜{{plan.end}}</span>
+        <span>{{plan.start|format4date}}<span ng-if="plan.end">から{{plan.end|format4date}}</span>
       </ion-item>
 
       <ion-item class="item-input">
         <span class="input-label">参加メンバー</span>
         <ion-list>
-          <div ng-repeat="member in memberlists">
-            <span ng-class="{red:member.attendance==1}">
-              {{member.name}}さん（{{attendance[member.attendance]}}）
-            </span>
+          <div ng-repeat="member in memberList">
+            {{member.name}}さん
+            <span ng-if="member.attendance_id != 1" ng-class="{red:member.attendance_id==2}">（{{attendance[member.attendance_id].value}}）</span>
           </div>
         </ion-list>
       </ion-item>
+
+      <ion-item>
+        <span class="newLine">{{plan.summary}}</span>
+      </ion-item>
+
+      <label class="item">
+        <button class="button button-block button-positive" ng-click="openPlanEdit()">編集</button>
+      </label>
 
     </ion-list>
   </ion-content>

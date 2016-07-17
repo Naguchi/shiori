@@ -70,4 +70,22 @@ angular.module('starter', ['ionic', 'starter.controllers'])
   });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/planlists');
+})
+
+.filter('format4date', function() {
+  function formatDate(date) {
+    if (typeof date != 'string') {
+      return false;
+    }
+    date = new Date(date.replace(/-/g, '/'));
+    return date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日';
+  }
+  return function(date) {
+    return formatDate(date);
+  };
+})
+.filter('date2date', function(data) {
+  data = angular.fromJson(data);
+  data.createdAt = new Date(data.createdAt);
+  return data;
 });

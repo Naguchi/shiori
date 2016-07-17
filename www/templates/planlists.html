@@ -1,10 +1,13 @@
 <ion-view view-title="プラン一覧">
-  <ion-content>
-    <ion-list>
-      <ion-item ng-repeat="plan in planlists" href="#/app/planlists/{{plan.id}}">
-        {{plan.title}}<br>
-        {{plan.start}}から{{plan.end}}
-     	</ion-item>
-    </ion-list>
-  </ion-content>
+	<ion-content>
+		<ion-list>
+			<ion-item ng-repeat="plan in planlists" href="#/app/planlists/{{plan.id}}">
+				<div class="listColumn listIndexColumn">{{$index+1}}</div>
+				<div class="listColumn">
+					<h2>{{plan.title}}<h2>
+					<p>{{plan.start|format4date}}<span ng-if="plan.end">から{{plan.end|format4date}}</span></p>
+				</div>
+		 </ion-item>
+		</ion-list>
+	</ion-content>
 </ion-view>

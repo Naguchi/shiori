@@ -41,62 +41,56 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('PlanlistsCtrl', function($scope) {
-  // DBからプラン一覧を取得する
-  var planlists = [
-    {
-      id : '1',
-      title : '伊豆ツーリング',
-      summary : '異種ツーリングメンバーでターンパイク行った後に伊豆に泊まり、翌日は相模湖のプレジャーフォレストでBBQ。',
-      start : '2016-05-21',
-      end : '2016-05-22',
-    },
-    {
-      id : '2',
-      title : 'テスト',
-      summary : 'テストサマリー',
-      start : '1992-06-05',
-      end : '',
-    },
-    /*
-    { title: 'Reggae', id: 1 },
-    { title: 'Chill', id: 2 },
-    { title: 'Dubstep', id: 3 },
-    { title: 'Indie', id: 4 },
-    { title: 'Rap', id: 5 },
-    { title: 'Cowbell', id: 6 }
-    */
-  ];
-  angular.forEach(planlists, function(plan, key) {
-
-
+.controller('PlanlistsCtrl', function($scope, $stateParams, $ionicModal, $http) {
+  $http.post('http://localhost:8888/shiori-of-travel/api/planList.php')
+  .success(function(data) {
+    $scope.planlists = data;
   });
-  $scope.planlists = planlists;
 })
 
-.controller('PlanCtrl', function($scope, $stateParams) {
+.controller('PlanCtrl', function($scope, $stateParams, $ionicModal, $http) {
   var planId = $stateParams;
 
-  var plan = {
-    id : '1',
-    title : '伊豆ツーリング',
-    summary : '異種ツーリングメンバーでターンパイク行った後に伊豆に泊まり、翌日は相模湖のプレジャーフォレストでBBQ。',
-    start : '2016-05-21',
-    end : '2016-05-22',
+  $http.post('http://localhost:8888/shiori-of-travel/api/attendanceList.php')
+  .success(function(data) {
+    $scope.attendance = data;
+  });
+
+  var planId = $stateParams['planId'];
+  var params = 'planId=' + planId;
+
+  $http.post('http://localhost:8888/shiori-of-travel/api/plan.php', encodeURI(params),{
+    headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+  })
+  .success(function(data) {
+    if (data.success) {
+      var plan = data.planInfo;
+      var memberList = data.memberList;
+      $scope.plan = plan;
+      $scope.memberList = memberList;
+    }
+  });
+
+  $ionicModal.fromTemplateUrl('templates/plan_edit.html', {
+    scope: $scope
+  }).then(function(modal) {
+    $scope.modalPlanEdit = modal;
+  });
+  $scope.openPlanEdit = function() {
+    var plan = $scope.plan;
+    $scope.edit = [];
+    $scope.edit.plan = plan;
+    $scope.title = plan.title;
+
+    $scope.modalPlanEdit.show();
   };
-  var memberlists = [
-    { name : 'なぐっち', attendance : 6 },
-    { name : '岡田', attendance : 2 },
-    { name : '前田', attendance : 1 },
-    { name : 'くろかい', attendance : 2 },
-    { name : 'こば', attendance : 5 },
-  ];
+  $scope.closePlanEdit = function() {
+    $scope.modalPlanEdit.hide();
+  };
+  $scope.submitPlanEdit = function() {
+    $scope.plan = $scope.edit.plan;
 
-  $scope.plan = plan;
-  $scope.memberlists = memberlists;
-  $scope.attendance = ['', '連絡なし', '参加', '不参加', '検討中' ,'途中から合流', '途中から離脱'];
-
-
-
+    $scope.closePlanEdit();
+  };
 
 });
