@@ -41,11 +41,81 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('PlanlistsCtrl', function($scope, $stateParams, $ionicModal, $http) {
+.controller('PlanlistsCtrl', function($scope, $stateParams, $ionicModal, $http, $ionicPopup) {
   $http.post('http://localhost:8888/shiori-of-travel/api/planList.php')
   .success(function(data) {
     $scope.planlists = data;
   });
+
+  $ionicModal.fromTemplateUrl('templates/plan_add.html', {
+    scope: $scope
+  }).then(function(modal) {
+    $scope.modalPlanAdd = modal;
+  });
+  $scope.openPlanAdd = function() {
+    $scope.plan = [];
+    $scope.plan.add = [];
+    $scope.modalPlanAdd.show();
+  };
+  $scope.closePlanAdd = function() {
+    $scope.modalPlanAdd.hide();
+  };
+  $scope.submitPlanAdd = function() {
+    var plan = $scope.plan.add;
+
+    // タイトルがない場合は処理しない
+    if (! plan.title) {
+      $ionicPopup.alert({
+        title: 'サーバーエラー',
+        template: 'タイトルを入力してください。'
+      });
+      return;
+    }
+
+    var params = '?hoge=piyo';
+    if (plan.title) {
+      params += '&title=' + plan.title;
+    }
+    if (plan.summary) {
+      params += '&summary=' + plan.summary;
+    }
+    if (plan.start) {
+      var date = plan.start;
+      var start = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+      params += '&start=' + start;
+
+      if (plan.end) {
+        var date = plan.end;
+        var end = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+        params += '&end=' + end;
+      }
+    }
+
+    $http.post('http://localhost:8888/shiori-of-travel/api/planAdd.php', encodeURI(params),{
+      headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+    })
+    .success(function(data) {
+      var title, title;
+      if (data.success) {
+        $ionicPopup.alert({
+          title: plan.title,
+          template: 'プランを追加しました。'
+        });
+        $http.post('http://localhost:8888/shiori-of-travel/api/planList.php')
+        .success(function(data) {
+          $scope.planlists = data;
+        });
+      } else {
+        $ionicPopup.alert({
+          title: 'サーバーエラー',
+          template: 'プランが追加できませんでした。'
+        });
+      }
+    });
+
+    $scope.closePlanAdd();
+  };
+
 })
 
 .controller('PlanCtrl', function($scope, $stateParams, $ionicModal, $http) {
@@ -78,9 +148,8 @@ angular.module('starter.controllers', [])
   });
   $scope.openPlanEdit = function() {
     var plan = $scope.plan;
-    $scope.edit = [];
-    $scope.edit.plan = plan;
-    $scope.title = plan.title;
+    $scope.plan.edit = [];
+    $scope.plan.edit = plan;
 
     $scope.modalPlanEdit.show();
   };
@@ -88,7 +157,7 @@ angular.module('starter.controllers', [])
     $scope.modalPlanEdit.hide();
   };
   $scope.submitPlanEdit = function() {
-    $scope.plan = $scope.edit.plan;
+    $scope.plan = $scope.plan.edit;
 
     $scope.closePlanEdit();
   };
