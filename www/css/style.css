@@ -17,3 +17,8 @@
 .listIndexColumn {
   width: 2em;
 }
+
+#content_title {
+  margin: 5px;
+  font-size: x-large;
+}

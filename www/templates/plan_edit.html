@@ -1,0 +1,43 @@
+<ion-modal-view>
+  <ion-header-bar>
+    <h1 class="title">{{plan.title}}</h1>
+    <div class="buttons">
+      <button class="button" ng-click="closePlanEdit()">戻る</button>
+    </div>
+  </ion-header-bar>
+  <ion-content>
+    <form ng-submit="submitPlanEdit()">
+      <div class="list">
+        <label class="item item-input">
+          <span class="input-label">プラン名</span>
+          <input type="text" ng-model="plan.edit.title">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">開催開始日</span>
+          <input type="date" ng-model="plan.edit.start">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">開催終了日</span>
+          <input type="date" ng-model="plan.edit.end">
+        </label>
+        <label class="item item-input">
+          <span class="input-label">参加メンバー</span>
+          <ion-list>
+            <div ng-repeat="member in memberlists">
+              <span ng-class="{red:member.attendance==1}">
+                {{member.name}}さん（{{attendance[member.attendance]}}）
+              </span>
+            </div>
+          </ion-list>
+        </label>
+        <label class="item item-input">
+          <input type="textarea" ng-model="plan.edit.summary">
+        </label>
+        <label class="item">
+          <button class="button button-block button-positive" type="submit">決定</button>
+        </label>
+
+      </div>
+    </form>
+  </ion-content>
+</ion-modal-view>
