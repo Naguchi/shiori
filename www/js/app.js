@@ -4,9 +4,23 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
+
 angular.module('starter', ['ionic', 'starter.controllers'])
 
+.provider("UserUiid", function () {
+// console.log("provider");
+  var userId = "1";
+  return {
+    getUserId: function() {
+      return userId;
+    },
+    $get: function () {
+    }
+  }
+})
+
 .run(function($ionicPlatform) {
+// console.log("run");
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -22,7 +36,11 @@ angular.module('starter', ['ionic', 'starter.controllers'])
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+.config(function(UserUiidProvider, $stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+// console.log("config");
+  var userId = UserUiidProvider.getUserId();
+// console.log(userId);
+
   $stateProvider
 
     .state('app', {
@@ -103,6 +121,20 @@ angular.module('starter', ['ionic', 'starter.controllers'])
   }
   return function(date) {
     return formatDate(date);
+  };
+})
+.filter('format4hhmm', function() {
+  function formatTime(time) {
+    if (typeof time == 'string') {
+      time_string = time;
+      time_array = time_string.split(':');
+      return time_array[0] + '時' + time_array[1] + '分';
+    } else {
+      return false;
+    }
+  }
+  return function(time) {
+    return formatTime(time);
   };
 })
 ;

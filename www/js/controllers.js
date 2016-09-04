@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+.controller('AppCtrl', function($scope, $ionicModal, $timeout, $http) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -11,6 +11,7 @@ angular.module('starter.controllers', [])
 
   // Form data for the login modal
   $scope.loginData = {};
+  $scope.plannerId = 0;
 
   // Create the login modal that we will use later
   $ionicModal.fromTemplateUrl('templates/login.html', {
@@ -32,6 +33,19 @@ angular.module('starter.controllers', [])
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
     console.log('Doing login', $scope.loginData);
+    if ($scope.loginData.plannerId == 'fd') {
+      $scope.plannerId = 2;
+    }
+
+    var params = 'planner_id=' + $scope.plannerId;
+    $http.post('http://localhost:8888/shiori-of-travel/api/planList.php', encodeURI(params), {
+      headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+    })
+    .success(function(data) {
+      if (data.success) {
+        $scope.planlists = data.planList;
+      }
+    });
 
     // Simulate a login delay. Remove this and replace with your login
     // code if using a login system
@@ -42,10 +56,15 @@ angular.module('starter.controllers', [])
 })
 
 .controller('PlanlistsCtrl', function($scope, $stateParams, $ionicModal, $http, $ionicPopup) {
-  $http.post('http://localhost:8888/shiori-of-travel/api/planList.php')
-  .success(function(data) {
-    $scope.planlists = data;
-  });
+  // var params = 'planner_id=' + $scope.plannerId;
+  // $http.post('http://localhost:8888/shiori-of-travel/api/planList.php', encodeURI(params), {
+  //   headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+  // })
+  // .success(function(data) {
+  //   if (data.success) {
+  //     $scope.planlists = data.planList;
+  //   }
+  // });
 
   $ionicModal.fromTemplateUrl('templates/plan_add.html', {
     scope: $scope
@@ -53,8 +72,21 @@ angular.module('starter.controllers', [])
     $scope.modalPlanAdd = modal;
   });
   $scope.openPlanAdd = function() {
+console.log($scope.plannerId);
     $scope.plan = [];
     $scope.plan.add = [];
+
+    var params = 'planner_id=' + $scope.plannerId;
+
+    $http.post('http://localhost:8888/shiori-of-travel/api/memberList.php', encodeURI(params),{
+      headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+    })
+    .success(function(data) {
+      if (data.success) {
+        $scope.plan.add.memberList = data.memberList;
+      }
+    });
+
     $scope.modalPlanAdd.show();
   };
   $scope.closePlanAdd = function() {
@@ -95,16 +127,38 @@ angular.module('starter.controllers', [])
       headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
     })
     .success(function(data) {
-      var title, title;
       if (data.success) {
+        var planId = data.plan_id;
+        var memberList = [];
+        angular.forEach(plan.memberList, function(member) {
+          if (member.checked) {
+            memberList.push(member.id);
+          }
+        });
+
+        if (memberList.length) {
+          var params = '';
+          var memberListStr = memberList.join(',');
+
+          params = 'plan_id=' + planId + '&member=' + memberListStr;
+          $http.post('http://localhost:8888/shiori-of-travel/api/planMemberAdd.php', encodeURI(params),{
+            headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+          });
+        }
+
         $ionicPopup.alert({
           title: plan.title,
           template: 'プランを追加しました。'
         });
-        $http.post('http://localhost:8888/shiori-of-travel/api/planList.php')
-        .success(function(data) {
-          $scope.planlists = data;
-        });
+          var params = 'planner_id=' + $scope.plannerId;
+          $http.post('http://localhost:8888/shiori-of-travel/api/planList.php', encodeURI(params), {
+            headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+          })
+          .success(function(data) {
+            if (data.success) {
+              $scope.planlists = data.planList;
+            }
+          });
       } else {
         $ionicPopup.alert({
           title: 'サーバーエラー',
@@ -136,8 +190,22 @@ angular.module('starter.controllers', [])
     if (data.success) {
       var plan = data.planInfo;
       var memberList = data.memberList;
+      var scheduleList = data.scheduleList;
+
+      // プラン詳細に表示するスケジュールを日別に出す
+      var groupingDate = [];
+      var date = '';
+      angular.forEach(scheduleList, function(schedule) {
+        if (date != schedule.departure_date) {
+          date = schedule.departure_date;
+          groupingDate.push(schedule.departure_date);
+        }
+      });
+
       $scope.plan = plan;
       $scope.memberList = memberList;
+      $scope.scheduleList = scheduleList;
+      $scope.groupingDate = groupingDate;
     }
   });
 

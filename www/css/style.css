@@ -22,3 +22,11 @@
   margin: 5px;
   font-size: x-large;
 }
+
+.big {
+	font-size: 125%;
+}
+
+.member_list {
+	padding: 1px 100% 10px 0px;
+}

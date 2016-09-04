@@ -23,10 +23,12 @@
         <label class="item item-input">
           <span class="input-label">参加メンバー</span>
           <ion-list>
-            <div ng-repeat="member in memberlists">
-              <span ng-class="{red:member.attendance==1}">
-                {{member.name}}さん（{{attendance[member.attendance]}}）
-              </span>
+            <div ng-repeat="member in plan.add.memberList">
+              <input ng-show=false type="checkbox" id="member_{{member.id}}" ng-model="member.checked" />
+
+              <select ng-model="user.select1" ng-options="jojo for jojo in ['jonasun','joseph','jotaro']"></select>
+              <label ng-show="! member.checked" for="member_{{member.id}}" class="member_list big">□&nbsp;{{member.name}}</label>
+              <label ng-show="  member.checked" for="member_{{member.id}}" class="member_list big">■&nbsp;{{member.name}}</label>
             </div>
           </ion-list>
         </label>
@@ -34,11 +36,9 @@
           <span class="input-label">詳細説明</span>
           <input type="textarea" ng-model="plan.add.summary">
         </label>
-
         <label class="item">
           <button class="button button-block button-positive" type="submit">決定</button>
         </label>
-
       </div>
     </form>
   </ion-content>
