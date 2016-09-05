@@ -33,8 +33,11 @@ angular.module('starter.controllers', [])
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
     console.log('Doing login', $scope.loginData);
-    if ($scope.loginData.plannerId == 'fd') {
+    var car = $scope.loginData.plannerId;
+    if (car == 'fd') {
       $scope.plannerId = 2;
+    } else if (car == 'mpv') {
+      $scope.plannerId = 1;
     }
 
     var params = 'planner_id=' + $scope.plannerId;
@@ -181,7 +184,9 @@ console.log($scope.plannerId);
   });
 
   var planId = $stateParams['planId'];
-  var params = 'planId=' + planId;
+  var plannerId = $scope.plannerId;
+  var params = 'planner_id=' + plannerId;
+  params += '&plan_id=' + planId;
 
   $http.post('http://localhost:8888/shiori-of-travel/api/plan.php', encodeURI(params),{
     headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}

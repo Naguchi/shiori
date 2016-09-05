@@ -24,12 +24,12 @@
         <span class="newLine">{{plan.summary}}</span>
       </ion-item>
 
-
       <ion-item ng-if="groupingDate.length" ng-repeat="date in groupingDate" class="item-input">
         <span class="input-label">スケジュール<br>【{{date|format4yyyymd}}】</span>
         <ion-list>
             <div ng-repeat="schedule in scheduleList" ng-if="date==schedule.departure_date">
-              {{schedule.departure_time|format4hhmm}} : &nbsp;{{schedule.departure_place}}
+              <span ng-if="schedule.departure_time">{{schedule.departure_time|format4hhmm}}&nbsp;:&nbsp;</span>
+              {{schedule.departure_place}}
             </div>
         </ion-list>
       </ion-item>

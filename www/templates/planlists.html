@@ -1,6 +1,6 @@
 <ion-view view-title="プラン一覧">
   <ion-content>
-    <ion-list>
+    <ion-list ng-if="plannerId != 0">
       <ion-item ng-repeat="plan in planlists" href="#/app/planlists/{{plan.id}}">
         <div class="listColumn listIndexColumn">{{$index+1}}</div>
         <div class="listColumn">
@@ -12,5 +12,6 @@
         <button class="button button-block button-positive" ng-click="openPlanAdd()">追加</button>
       </ion-item>
     </ion-list>
+    <div ng-if="plannerId == 0"> ↑↑↑ まずはここを押してログインしよう！</div>
   </ion-content>
 </ion-view>
