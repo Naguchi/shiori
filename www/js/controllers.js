@@ -33,20 +33,27 @@ angular.module('starter.controllers', [])
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
     console.log('Doing login', $scope.loginData);
-    var car = $scope.loginData.plannerId;
-    if (car == 'fd') {
-      $scope.plannerId = 2;
-    } else if (car == 'mpv') {
-      $scope.plannerId = 1;
-    }
+    var plannerName = $scope.loginData.plannerId;
+    $scope.plannerId = 0;
 
-    var params = 'planner_id=' + $scope.plannerId;
-    $http.post('http://localhost:8888/shiori-of-travel/api/planList.php', encodeURI(params), {
+    var params = 'planner_name=' + plannerName;
+    $http.post('http://naguchi.asia/shiori-of-travel/api/planner.php', encodeURI(params), {
       headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
     })
     .success(function(data) {
       if (data.success) {
-        $scope.planlists = data.planList;
+      	var plannerId = data.plannerId;
+      	$scope.plannerId = plannerId;
+
+        var params = 'planner_id=' + plannerId;
+        $http.post('http://naguchi.asia/shiori-of-travel/api/planList.php', encodeURI(params), {
+          headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+        })
+        .success(function(data) {
+          if (data.success) {
+            $scope.planlists = data.planList;
+          }
+        });
       }
     });
 
@@ -60,7 +67,7 @@ angular.module('starter.controllers', [])
 
 .controller('PlanlistsCtrl', function($scope, $stateParams, $ionicModal, $http, $ionicPopup) {
   // var params = 'planner_id=' + $scope.plannerId;
-  // $http.post('http://localhost:8888/shiori-of-travel/api/planList.php', encodeURI(params), {
+  // $http.post('http://naguchi.asia/shiori-of-travel/api/planList.php', encodeURI(params), {
   //   headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
   // })
   // .success(function(data) {
@@ -75,13 +82,12 @@ angular.module('starter.controllers', [])
     $scope.modalPlanAdd = modal;
   });
   $scope.openPlanAdd = function() {
-console.log($scope.plannerId);
     $scope.plan = [];
     $scope.plan.add = [];
 
     var params = 'planner_id=' + $scope.plannerId;
 
-    $http.post('http://localhost:8888/shiori-of-travel/api/memberList.php', encodeURI(params),{
+    $http.post('http://naguchi.asia/shiori-of-travel/api/memberList.php', encodeURI(params),{
       headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
     })
     .success(function(data) {
@@ -126,7 +132,7 @@ console.log($scope.plannerId);
       }
     }
 
-    $http.post('http://localhost:8888/shiori-of-travel/api/planAdd.php', encodeURI(params),{
+    $http.post('http://naguchi.asia/shiori-of-travel/api/planAdd.php', encodeURI(params),{
       headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
     })
     .success(function(data) {
@@ -144,7 +150,7 @@ console.log($scope.plannerId);
           var memberListStr = memberList.join(',');
 
           params = 'plan_id=' + planId + '&member=' + memberListStr;
-          $http.post('http://localhost:8888/shiori-of-travel/api/planMemberAdd.php', encodeURI(params),{
+          $http.post('http://naguchi.asia/shiori-of-travel/api/planMemberAdd.php', encodeURI(params),{
             headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
           });
         }
@@ -154,7 +160,7 @@ console.log($scope.plannerId);
           template: 'プランを追加しました。'
         });
           var params = 'planner_id=' + $scope.plannerId;
-          $http.post('http://localhost:8888/shiori-of-travel/api/planList.php', encodeURI(params), {
+          $http.post('http://naguchi.asia/shiori-of-travel/api/planList.php', encodeURI(params), {
             headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
           })
           .success(function(data) {
@@ -178,7 +184,7 @@ console.log($scope.plannerId);
 .controller('PlanCtrl', function($scope, $stateParams, $ionicModal, $http) {
   var planId = $stateParams;
 
-  $http.post('http://localhost:8888/shiori-of-travel/api/attendanceList.php')
+  $http.post('http://naguchi.asia/shiori-of-travel/api/attendanceList.php')
   .success(function(data) {
     $scope.attendance = data;
   });
@@ -188,7 +194,7 @@ console.log($scope.plannerId);
   var params = 'planner_id=' + plannerId;
   params += '&plan_id=' + planId;
 
-  $http.post('http://localhost:8888/shiori-of-travel/api/plan.php', encodeURI(params),{
+  $http.post('http://naguchi.asia/shiori-of-travel/api/plan.php', encodeURI(params),{
     headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
   })
   .success(function(data) {
@@ -201,9 +207,9 @@ console.log($scope.plannerId);
       var groupingDate = [];
       var date = '';
       angular.forEach(scheduleList, function(schedule) {
-        if (date != schedule.departure_date) {
-          date = schedule.departure_date;
-          groupingDate.push(schedule.departure_date);
+        if (date != schedule.meeting_date) {
+          date = schedule.meeting_date;
+          groupingDate.push(schedule.meeting_date);
         }
       });
 

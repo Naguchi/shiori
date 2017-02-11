@@ -27,15 +27,15 @@
       <ion-item ng-if="groupingDate.length" ng-repeat="date in groupingDate" class="item-input">
         <span class="input-label">スケジュール<br>【{{date|format4yyyymd}}】</span>
         <ion-list>
-            <div ng-repeat="schedule in scheduleList" ng-if="date==schedule.departure_date">
-              <span ng-if="schedule.departure_time">{{schedule.departure_time|format4hhmm}}&nbsp;:&nbsp;</span>
-              {{schedule.departure_place}}
+            <div ng-repeat="schedule in scheduleList" ng-if="date==schedule.meeting_date">
+              <span ng-if="schedule.meeting_time">{{schedule.meeting_time|format4hhmm}}&nbsp;:&nbsp;</span>
+              {{schedule.meeting_place}}
             </div>
         </ion-list>
       </ion-item>
 
       <label class="item">
-        <button class="button button-block button-positive" ng-click="openPlanEdit()">編集</button>
+        <button ng-disabled="true" class="button button-block button-positive" ng-click="openPlanEdit()">編集</button>
       </label>
 
     </ion-list>
