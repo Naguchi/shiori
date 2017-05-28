@@ -25,8 +25,7 @@
           <ion-list>
             <div ng-repeat="member in plan.add.memberList">
               <input ng-show=false type="checkbox" id="member_{{member.id}}" ng-model="member.checked" />
-
-              <select ng-model="user.select1" ng-options="jojo for jojo in ['jonasun','joseph','jotaro']"></select>
+              <select ng-model="attendanceList[0]" ng-options="attendance.value for attendance in attendanceList"></select>
               <label ng-show="! member.checked" for="member_{{member.id}}" class="member_list big">□&nbsp;{{member.name}}</label>
               <label ng-show="  member.checked" for="member_{{member.id}}" class="member_list big">■&nbsp;{{member.name}}</label>
             </div>

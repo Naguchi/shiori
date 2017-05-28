@@ -1,17 +1,21 @@
 angular.module('starter.controllers', [])
 
 .controller('AppCtrl', function($scope, $ionicModal, $timeout, $http) {
-
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //$scope.$on('$ionicView.enter', function(e) {
-  //});
-
-  // Form data for the login modal
+ // Form data for the login modal
   $scope.loginData = {};
   $scope.plannerId = 0;
+  var plannerId = $scope.plannerId;
+  if (plannerId != 0) {
+    var params = 'planner_id=' + plannerId;
+    $http.post('http://naguchi.asia/shiori-of-travel/api/planList.php', encodeURI(params), {
+      headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+    })
+    .success(function(data) {
+      if (data.success) {
+        $scope.planlists = data.planList;
+      }
+    });
+  }
 
   // Create the login modal that we will use later
   $ionicModal.fromTemplateUrl('templates/login.html', {
@@ -42,8 +46,8 @@ angular.module('starter.controllers', [])
     })
     .success(function(data) {
       if (data.success) {
-      	var plannerId = data.plannerId;
-      	$scope.plannerId = plannerId;
+        var plannerId = data.plannerId;
+        $scope.plannerId = plannerId;
 
         var params = 'planner_id=' + plannerId;
         $http.post('http://naguchi.asia/shiori-of-travel/api/planList.php', encodeURI(params), {
@@ -66,16 +70,6 @@ angular.module('starter.controllers', [])
 })
 
 .controller('PlanlistsCtrl', function($scope, $stateParams, $ionicModal, $http, $ionicPopup) {
-  // var params = 'planner_id=' + $scope.plannerId;
-  // $http.post('http://naguchi.asia/shiori-of-travel/api/planList.php', encodeURI(params), {
-  //   headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
-  // })
-  // .success(function(data) {
-  //   if (data.success) {
-  //     $scope.planlists = data.planList;
-  //   }
-  // });
-
   $ionicModal.fromTemplateUrl('templates/plan_add.html', {
     scope: $scope
   }).then(function(modal) {
@@ -84,6 +78,11 @@ angular.module('starter.controllers', [])
   $scope.openPlanAdd = function() {
     $scope.plan = [];
     $scope.plan.add = [];
+
+    $http.post('http://naguchi.asia/shiori-of-travel/api/attendanceList.php')
+    .success(function(data) {
+      $scope.attendanceList = data;
+    });
 
     var params = 'planner_id=' + $scope.plannerId;
 
@@ -113,7 +112,7 @@ angular.module('starter.controllers', [])
       return;
     }
 
-    var params = '?hoge=piyo';
+    var params = 'planner_id=' + $scope.plannerId;
     if (plan.title) {
       params += '&title=' + plan.title;
     }
@@ -171,8 +170,9 @@ angular.module('starter.controllers', [])
       } else {
         $ionicPopup.alert({
           title: 'サーバーエラー',
-          template: 'プランが追加できませんでした。'
+          template: data.message
         });
+        console.log(data.params);
       }
     });
 
