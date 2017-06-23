@@ -3,7 +3,7 @@ angular.module('starter.controllers', [])
 .controller('AppCtrl', function($scope, $ionicModal, $timeout, $http) {
  // Form data for the login modal
   $scope.loginData = {};
-  $scope.plannerId = 0;
+  $scope.plannerId = 3;
   var plannerId = $scope.plannerId;
   if (plannerId != 0) {
     var params = 'planner_id=' + plannerId;
@@ -79,19 +79,23 @@ angular.module('starter.controllers', [])
     $scope.plan = [];
     $scope.plan.add = [];
 
-    $http.post('http://naguchi.asia/shiori-of-travel/api/attendanceList.php')
-    .success(function(data) {
-      $scope.attendanceList = data;
-    });
-
     var params = 'planner_id=' + $scope.plannerId;
-
     $http.post('http://naguchi.asia/shiori-of-travel/api/memberList.php', encodeURI(params),{
       headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
     })
     .success(function(data) {
       if (data.success) {
-        $scope.plan.add.memberList = data.memberList;
+        var memberList = data.memberList;
+        $scope.plan.add.memberList = memberList;
+
+        $http.post('http://naguchi.asia/shiori-of-travel/api/attendanceList.php')
+        .success(function(data) {
+          var attendanceList = data;
+
+          angular.forEach($scope.plan.add.memberList, function(memberList) {
+            memberList.attendanceList = attendanceList;
+          });
+        });
       }
     });
 
@@ -136,21 +140,32 @@ angular.module('starter.controllers', [])
     })
     .success(function(data) {
       if (data.success) {
+
+        // 出欠情報の追加
         var planId = data.plan_id;
-        var memberList = [];
-        angular.forEach(plan.memberList, function(member) {
-          if (member.checked) {
-            memberList.push(member.id);
-          }
+        var add_plan_member_params = [];
+        angular.forEach(plan.memberList, function(member, key) {
+          add_plan_member_params[key] = [];
+          add_plan_member_params[key]['planner_id'] = member.planner_id;
+          add_plan_member_params[key]['member_id'] = member['id'];
+          add_plan_member_params[key]['attendance_id'] = member['attendance_id'];
         });
 
-        if (memberList.length) {
-          var params = '';
-          var memberListStr = memberList.join(',');
-
-          params = 'plan_id=' + planId + '&member=' + memberListStr;
-          $http.post('http://naguchi.asia/shiori-of-travel/api/planMemberAdd.php', encodeURI(params),{
-            headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+        // 出欠情報の保存
+        if (add_plan_member_params.length) {
+          angular.forEach(add_plan_member_params, function(add_plan_member_param) {
+            // 出欠情報が無いメンバーは登録しない
+            if (add_plan_member_param.attendance_id) {
+              var params = 'member_id=' + add_plan_member_param.member_id;
+              params += '&plan_id=' + planId;
+              params += '&attendance_id=' + add_plan_member_param.attendance_id;
+              $http.post('http://naguchi.asia/shiori-of-travel/api/planMemberAdd.php', encodeURI(params),{
+                headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+              })
+              .success(function(data){
+                console.log(data);
+              });
+            }
           });
         }
 
@@ -172,7 +187,6 @@ angular.module('starter.controllers', [])
           title: 'サーバーエラー',
           template: data.message
         });
-        console.log(data.params);
       }
     });
 
